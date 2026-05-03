@@ -227,40 +227,40 @@ const DATA = {
             drops: ["titanium_ingot"]
         },
         {
-            name: "Celestial Crystal",
-            desc: "Energy-based rare mineral.",
-            spawn: { structure: "Meteor Crash", rarity: "rare" },
-            drops: ["celestial_shard"]
-        }
-    ],
+            name: "Kryptonite",
+            desc: "Radioactive mineral from crashed meteors.",
+            spawn: { structure: "Kryptonite Meteor", rarity: "rare" },
+            drops: ["kryptonite_shard"]
+        },
+        {
+            name: "Blue Kryptonite",
+            desc: "A unique isotopic variation of kryptonite.",
+            spawn: { structure: "Blue Kryptonite Meteor", rarity: "very rare" },
+            drops: ["blue_kryptonite_shard"]
+        }
+    ],
     structures: [
-        {
-            name: "Abandoned Lab",
-            desc: "Contains injections and tech.",
-            spawn: { dimension: "overworld", rarity: "rare" },
-            contains: ["injections", "loot crates"]
-        },
-        {
-            name: "Meteor Crash",
-            desc: "Crash site with celestial materials.",
-            spawn: { surface: true, rarity: "rare" },
-            contains: ["celestial crystal"]
-        }
-    ],
-    entities: [
-        {
-            name: "Energy Wraith",
-            desc: "Hostile energy being.",
-            spawn: { biome: "celestial", time: "night" },
-            drops: ["energy_core"]
-        },
-        {
-            name: "Test Subject",
-            desc: "Mutated human.",
-            spawn: { structure: "Abandoned Lab" },
-            abilities: ["random powers"]
-        }
-    ]
+        {
+            name: "Kryptonite Meteor",
+            desc: "A fallen radioactive rock from space.",
+            spawn: { dimension: "overworld", biome: "plains" },
+            contains: ["kryptonite"]
+        },
+        {
+            name: "Blue Kryptonite Meteor",
+            desc: "A rare variant of fallen space debris.",
+            spawn: { dimension: "overworld", biome: "plains" },
+            contains: ["blue kryptonite"]
+        }
+    ],
+    entities: [
+        {
+            name: "Radioactive Spider",
+            desc: "A glowing arachnid with mutating venom.",
+            spawn: { biome: "forest", light_level: "low" },
+            drops: ["radioactive_gland"]
+        }
+    ]
 };
 
 // ================= LOGIC =================

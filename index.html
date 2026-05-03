@@ -15,10 +15,7 @@ body {
     padding:20px;
 }
 
-.container {
-    max-width:1100px;
-    margin:auto;
-}
+.container { max-width:1100px; margin:auto; }
 
 h1 {
     text-align:center;
@@ -47,7 +44,7 @@ h1 {
 
 .grid {
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
     gap:15px;
 }
 
@@ -59,16 +56,14 @@ h1 {
     transition:0.2s;
 }
 
-.card:hover {
-    border-color:var(--cyan);
-}
+.card:hover { border-color:var(--cyan); }
 
 .name {
     font-weight:bold;
     color:var(--cyan);
 }
 
-.spawn {
+.section {
     font-size:0.8rem;
     color:#aaa;
     margin-top:5px;
@@ -77,6 +72,16 @@ h1 {
 .desc {
     margin-top:10px;
     font-size:0.9rem;
+}
+
+.tag {
+    display:inline-block;
+    background:#222;
+    border:1px solid #444;
+    padding:3px 6px;
+    margin:3px 3px 0 0;
+    border-radius:4px;
+    font-size:0.7rem;
 }
 </style>
 </head>
@@ -97,66 +102,147 @@ h1 {
 </div>
 
 <script>
-// ================= DATA =================
+
+// ================= DATA SYSTEM =================
 
 const DATA = {
-    abilities: [
-        {
-            name: "Web Swing",
-            desc: "Swing through the air using web physics.",
-            spawn: "Unlocked via Spider DNA Injection"
-        },
-        {
-            name: "Heat Vision",
-            desc: "Fires a powerful laser beam from eyes.",
-            spawn: "Kryptonian DNA / Suit Ability"
-        },
-        {
-            name: "Super Speed",
-            desc: "Move at extreme speeds with lightning aura.",
-            spawn: "Speed Force Injection"
-        }
-    ],
 
-    ores: [
-        {
-            name: "Titanium Ore",
-            desc: "Used for high-tier suit crafting.",
-            spawn: "Y: -40 to 20 (Overworld)"
-        },
-        {
-            name: "Celestial Crystal",
-            desc: "Rare energy source for advanced abilities.",
-            spawn: "Meteor Structures"
-        }
-    ],
+abilities: [
+{
+    name: "Super Strength",
+    desc: "Increases melee damage massively.",
+    
+    scaling: {
+        damage: "base * (level / 10)",
+        knockback: "level * 0.2"
+    },
 
-    structures: [
-        {
-            name: "Abandoned Lab",
-            desc: "Contains injections and experimental tech.",
-            spawn: "Overworld (rare)"
-        },
-        {
-            name: "Meteor Crash",
-            desc: "Source of celestial materials.",
-            spawn: "Surface generation"
-        }
-    ],
+    visuals: {
+        aura: "red",
+        particles: "impact_shockwave"
+    },
 
-    entities: [
-        {
-            name: "Test Subject",
-            desc: "Mutated human with random abilities.",
-            spawn: "Labs / Night spawn"
-        },
-        {
-            name: "Energy Wraith",
-            desc: "Hostile entity made of raw energy.",
-            spawn: "Celestial zones"
-        }
-    ]
+    tags: ["passive", "combat"]
+},
+
+{
+    name: "Super Speed",
+    desc: "Move at extreme speeds.",
+    
+    scaling: {
+        speed: "base + (level * 0.5)"
+    },
+
+    visuals: {
+        trailColor: "yellow",
+        lightning: true
+    },
+
+    tags: ["movement"]
+},
+
+{
+    name: "Web Swing",
+    desc: "Swing using web physics.",
+
+    mechanics: {
+        range: 40,
+        velocity: 2
+    },
+
+    tags: ["movement"]
+}
+],
+
+
+// ================= ORES =================
+
+ores: [
+{
+    name: "Titanium Ore",
+    desc: "High-tier crafting material.",
+
+    spawn: {
+        dimension: "overworld",
+        y: "-40 to 20",
+        rarity: "uncommon"
+    },
+
+    drops: ["titanium_ingot"]
+},
+
+{
+    name: "Celestial Crystal",
+    desc: "Energy-based rare mineral.",
+
+    spawn: {
+        structure: "Meteor Crash",
+        rarity: "rare"
+    },
+
+    drops: ["celestial_shard"]
+}
+],
+
+
+// ================= STRUCTURES =================
+
+structures: [
+{
+    name: "Abandoned Lab",
+    desc: "Contains injections and tech.",
+
+    spawn: {
+        dimension: "overworld",
+        rarity: "rare"
+    },
+
+    contains: ["injections", "loot crates"]
+},
+
+{
+    name: "Meteor Crash",
+    desc: "Crash site with celestial materials.",
+
+    spawn: {
+        surface: true,
+        rarity: "rare"
+    },
+
+    contains: ["celestial crystal"]
+}
+],
+
+
+// ================= ENTITIES =================
+
+entities: [
+{
+    name: "Energy Wraith",
+    desc: "Hostile energy being.",
+
+    spawn: {
+        biome: "celestial",
+        time: "night"
+    },
+
+    drops: ["energy_core"]
+},
+
+{
+    name: "Test Subject",
+    desc: "Mutated human.",
+
+    spawn: {
+        structure: "Abandoned Lab"
+    },
+
+    abilities: ["random powers"]
+}
+]
+
 };
+
 
 // ================= LOGIC =================
 
@@ -171,11 +257,47 @@ function render(tab) {
     container.innerHTML = "";
 
     DATA[tab].forEach(item => {
+
+        let extra = "";
+
+        // ===== ABILITIES =====
+        if(tab === "abilities") {
+            if(item.scaling) {
+                extra += `<div class="section">Scaling:</div>`;
+                Object.entries(item.scaling).forEach(([k,v])=>{
+                    extra += `<div class="tag">${k}: ${v}</div>`;
+                });
+            }
+
+            if(item.visuals) {
+                extra += `<div class="section">Visuals:</div>`;
+                Object.entries(item.visuals).forEach(([k,v])=>{
+                    extra += `<div class="tag">${k}: ${v}</div>`;
+                });
+            }
+        }
+
+        // ===== SPAWN SYSTEM =====
+        if(item.spawn) {
+            extra += `<div class="section">Spawn:</div>`;
+            Object.entries(item.spawn).forEach(([k,v])=>{
+                extra += `<div class="tag">${k}: ${v}</div>`;
+            });
+        }
+
+        // ===== TAGS =====
+        if(item.tags) {
+            extra += `<div class="section">Tags:</div>`;
+            item.tags.forEach(t=>{
+                extra += `<div class="tag">${t}</div>`;
+            });
+        }
+
         container.innerHTML += `
             <div class="card">
                 <div class="name">${item.name}</div>
-                <div class="spawn">Spawn: ${item.spawn}</div>
                 <div class="desc">${item.desc}</div>
+                ${extra}
             </div>
         `;
     });
@@ -183,6 +305,7 @@ function render(tab) {
 
 // init
 render("abilities");
+
 </script>
 
 </body>
